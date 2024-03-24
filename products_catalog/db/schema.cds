@@ -1,6 +1,6 @@
-namespace db;
+namespace com.logali;
 
-entity Customer {
+entity Customers {
     key ID   : Integer;
         name : String;
 };
@@ -20,7 +20,7 @@ entity Products {
         Quantity         : Decimal(16, 2);
 };
 
-entity Supplier {
+entity Suppliers {
     key SupplierID : UUID;
         Name       : String;
         Street     : String;
@@ -33,7 +33,7 @@ entity Supplier {
         Fax        : String;
 };
 
-entity Category {
+entity Categories {
     key ID   : String(1);
         Name : String;
 
@@ -66,7 +66,7 @@ entity Months {
     ShortDescription: String(3);
 };
 
-entity ProductReview {
+entity ProductReviews {
     key Name: String;
     Rating: Integer;
     Comment: String;
