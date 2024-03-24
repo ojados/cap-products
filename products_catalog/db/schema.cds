@@ -6,7 +6,7 @@ entity Customers {
 };
 
 entity Products {
-    key ProductId        : UUID;
+    key ID        : UUID;
         Name             : String;
         Description      : String;
         ImageUrl         : String;
@@ -21,7 +21,7 @@ entity Products {
 };
 
 entity Suppliers {
-    key SupplierID : UUID;
+    key ID : UUID;
         Name       : String;
         Street     : String;
         City       : String;
@@ -67,12 +67,16 @@ entity Months {
 };
 
 entity ProductReviews {
-    key Name: String;
+    key ID: UUID;
+    ToProduct_Id: UUID;
+    CreatedAt: DateTime;
+    Name: String;
     Rating: Integer;
     Comment: String;
 };
 
 entity SalesData {
-key DeliveryDate: DateTime;
+key ID: UUID;
+DeliveryDate: DateTime;
 Revenue: Decimal(16,2);
 }
