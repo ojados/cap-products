@@ -63,6 +63,7 @@ context materials {
     entity StockAvailability {
         key ID          : Integer;
             Description : localized String;
+            Product   : Association to Products;
     };
 
     entity Currencies {
@@ -132,7 +133,6 @@ context materials {
     entity ProductReviews : cuid, managed {
         //    key ID           : UUID;
         //        ToProduct_Id : UUID;
-        CreatedAt : DateTime;
         Name      : Name;
         Rating    : Integer;
         Comment   : String;
