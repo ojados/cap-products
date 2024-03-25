@@ -16,35 +16,38 @@ using {com.logali as database} from '../db/schema';
 
 define service CatalogService {
     entity Products          as
-        select from database.materials.Products {
+        select from database.reports.Products {
             ID,
-            Name          as ProductName @mandatory,
-            Description @mandatory,
+            Name          as ProductName     @mandatory,
+            Description                      @mandatory,
             ImageUrl,
             ReleaseDate,
             DiscontinuedDate,
-            Price @mandatory,
+            Price                            @mandatory,
             Height,
             Width,
             Depth,
-            Quantity
-            @(
+            Quantity                         @(
                 mandatory,
                 assert.range: [
-                    0,00,
+                    0,
+                    00,
                     20
                 ]
-            )    
-            ,
+            ),
             UnitOfMeasure as ToUnitOfMeasure @mandatory,
-            Currency      as ToCurrency @mandatory,
-            Category      as ToCategory @mandatory,
-            Category.Name as Category @readonly,
+            Currency      as ToCurrency      @mandatory,
+            Category      as ToCategory      @mandatory,
+            Category.Name as Category        @readonly,
             DimensionUnit as ToDimensionUnit,
             SalesData,
             Supplier,
-            Reviews
+            Reviews,
+            Rating,
+            StockAvailability,
+            ToStockAvailability
         };
+
     @readonly
     entity Supplier          as
         select from database.sales.Suppliers {
@@ -65,7 +68,8 @@ define service CatalogService {
             createdAt,
             Product as ToProduct
         };
-@readonly
+
+    @readonly
     entity SalesData         as
         select from database.sales.SalesData {
             ID,
@@ -76,35 +80,88 @@ define service CatalogService {
             DeliveryMonth.Description as DeliveryMonth,
             Product                   as ToProduct
         };
-@readonly
+
+    @readonly
     entity StockAvailability as
         select from database.materials.StockAvailability {
             ID,
             Description,
             Product as ToProduct
         };
-@readonly
+
+    @readonly
     entity VH_Categories     as
         select from database.materials.Categories {
             ID   as Code,
             Name as Text
         };
-@readonly
+
+    @readonly
     entity VH_Currencies     as
         select from database.materials.Currencies {
             ID          as Code,
             Description as Text
         };
-@readonly
-    entity VH_UnitOfMeasure     as
+
+    @readonly
+    entity VH_UnitOfMeasure  as
         select from database.materials.UnitOfMeasures {
             ID          as Code,
             Description as Text
-        };     
-@readonly
-    entity VH_DimensionUnits     as
-        select 
-        ID as Code,
-        Description as Text
-        from database.materials.DimensionUnits;      // Proyección con Postfix: elementos antes             
+        };
+
+    @readonly
+    entity VH_DimensionUnits as
+        select
+            ID          as Code,
+            Description as Text
+        from database.materials.DimensionUnits; // Proyección con Postfix: elementos antes
+}
+
+define service MyService {
+
+    entity SuppliersProduct  as
+        select from database.materials.Products[Name = 'Bread']{
+            *,
+            Name,
+            Description,
+            Supplier.Address
+        }
+        where
+            Supplier.Address.PostalCode = 98074;
+
+    entity SuppliersToSales  as
+        select
+            Supplier.Email,
+            Category.Name,
+            SalesData.Currency.ID,
+            SalesData.Currency.Description
+        from database.materials.Products;
+
+    entity EntityInfix       as
+        select Supplier[Name = 'Exotic Liquids'].Phone from database.materials.Products
+        where
+            Products.Name = 'Bread';
+
+    entity EntityJoin        as
+        select Phone from database.materials.Products
+        left join database.sales.Suppliers as supp
+            on(
+                supp.ID = Products.Supplier.ID
+            )
+            and supp.Name = 'Exotic Liquids'
+        where
+            Products.Name = 'Bread';
+}
+
+define service Reports {
+    entity AverageRating     as projection on database.reports.AverageRating;
+    entity EntityCasting as select
+        cast(Price as Integer) as Price,
+        Price as Price2 : Integer
+    from database.materials.Products;
+
+    entity EntityExists as select from database.materials.Products {
+        Name
+    } where exists Supplier[Name = 'Exotic Liquids'];
 }

@@ -63,7 +63,7 @@ context materials {
     entity StockAvailability {
         key ID          : Integer;
             Description : localized String;
-            Product   : Association to Products;
+            Product     : Association to Products;
     };
 
     entity Currencies {
@@ -133,10 +133,10 @@ context materials {
     entity ProductReviews : cuid, managed {
         //    key ID           : UUID;
         //        ToProduct_Id : UUID;
-        Name      : Name;
-        Rating    : Integer;
-        Comment   : String;
-        Product   : Association to Products; // Association managed
+        Name    : Name;
+        Rating  : Integer;
+        Comment : String;
+        Product : Association to Products; // Association managed
     };
 
 }
@@ -183,4 +183,41 @@ context sales {
 
     }
 
+}
+
+context reports {
+
+    entity AverageRating as
+        select from materials.ProductReviews {
+            Product.ID  as ProductID,
+            avg(Rating) as AverageRating : Decimal(16, 2)
+        }
+        group by
+            Product.ID;
+
+    entity Products      as
+        select from materials.Products
+        mixin {
+            ToStockAvailability : Association to materials.StockAvailability
+                                      on ToStockAvailability.ID = $projection.StockAvailability;
+            ToAverageRating     : Association to AverageRating
+                                      on ToAverageRating.ProductID = ID;
+        }
+        into {
+            *,
+            ToAverageRating.AverageRating as Rating,
+            case
+                when
+                    Quantity >= 8
+                then
+                    3
+                when
+                    Quantity > 0
+                then
+                    2
+                else
+                    1
+            end                           as StockAvailability : Integer,
+            ToStockAvailability
+        }
 }
