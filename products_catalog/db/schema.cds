@@ -64,7 +64,7 @@ entity Products {
         Name             : Name not null; // default 'NoName';
         Description      : String;
         ImageUrl         : String;
-        Category         : String;
+        //        Category         : String;
         ReleaseDate      : DateTime default $now;
         //        CreationDate     : Date default CURRENT_DATE;
         DiscontinuedDate : DateTime;
@@ -73,6 +73,23 @@ entity Products {
         Width            : Decimal(16, 2);
         Depth            : Decimal(16, 2);
         Quantity         : Decimal(16, 2);
+        // // Association unmanaged
+        // Supplier_Id      : UUID;
+        // ToSupplier       : Association to one Suppliers
+        //                        on ToSupplier.ID = Supplier_Id;
+        // UnitOfMeasure_Id : String(2);
+        // ToUnitOfMeasure  : Association to one UnitOfMeasures
+        //                        on ToUnitOfMeasure.ID = UnitOfMeasure_Id;
+        // Association managed
+        Supplier         : Association to Suppliers;
+        UnitOfMeasure    : Association to UnitOfMeasures;
+        Currency         : Association to Currencies;
+        DimensionUnit    : Association to DimensionUnits;
+        Category         : Association to Categories;
+        SalesData        : Association to many SalesData
+                               on SalesData.Product = $self;
+        Reviews          : Association to many ProductReviews
+                               on Reviews.Product = $self;
 };
 
 entity Suppliers {
@@ -82,6 +99,8 @@ entity Suppliers {
         Email   : String;
         Phone   : String;
         Fax     : String;
+        Product : Association to many Products
+                      on Product.Supplier = $self;
 };
 
 
@@ -125,29 +144,34 @@ entity ProductReviews {
         Name         : Name;
         Rating       : Integer;
         Comment      : String;
+        Product      : Association to Products; // Association managed
 };
 
 entity SalesData {
-    key ID           : UUID;
-        DeliveryDate : DateTime;
-        Revenue      : Decimal(16, 2);
+    key ID            : UUID;
+        DeliveryDate  : DateTime;
+        Revenue       : Decimal(16, 2);
+        Product       : Association to Products;
+        Currency      : Association to Currencies;
+        DeliveryMonth : Association to Months;
+
 };
 
-entity SelProducts                   as select from Products;
+entity SelProducts   as select from Products;
 
-entity SelProducts1                  as
+entity SelProducts1  as
     select from Products {
         *
     };
 
-entity SelProducts2                  as
+entity SelProducts2  as
     select from Products {
         Name,
         Price,
         Quantity
     };
 
-entity SelProducts3                  as
+entity SelProducts3  as
     select from Products
     left join ProductReviews
         on Products.Name = ProductReviews.Name
@@ -163,14 +187,14 @@ entity SelProducts3                  as
     order by
         Rating;
 
-entity ProjProducts                  as projection on Products;
+entity ProjProducts  as projection on Products;
 
-entity ProjProducts2                 as
+entity ProjProducts2 as
     projection on Products {
         *
     };
 
-entity ProjProducts3                 as
+entity ProjProducts3 as
     projection on Products {
         ReleaseDate,
         Name
@@ -187,6 +211,54 @@ entity ProjProducts3                 as
 
 // entity ProjParamProducts(pName: String) as projection on Products where Name = :pName;
 extend Products with {
-    PriceCondition: String(2);
-    PriceDetermination: String(3);
+    PriceCondition     : String(2);
+    PriceDetermination : String(3);
+};
+
+// Sample showing association many to many
+entity Course {
+    key ID      : UUID;
+        Student : Association to many StudentCourse
+                      on Student.Course = $self;
+};
+
+entity Student {
+    key ID     : UUID;
+        Course : Association to many StudentCourse
+                     on Course.Student = $self;
+};
+
+entity StudentCourse {
+    key ID      : UUID;
+        Student : Association to Student;
+        Course  : Association to Course;
+
+
+};
+// Composition inline
+// entity Orders_opt {
+//     key ID: UUID;
+//     Date: Date;
+//     Customer: Association to Customers;
+//     Item: Composition of many {
+//         key Position: Integer;
+//         Order: Association to Orders;
+//         Product: Association to Products;
+//         Quantity: Integer;
+//     };
+// };
+
+entity Orders {
+    key ID: UUID;
+    Date: Date;
+    Customer: Association to Customers;
+    Item: Composition of many OrderItems on Item.Order = $self;
+    };
+
+entity OrderItems {
+    key ID: UUID;
+    Order: Association to Orders;
+    Product: Association to Products;
+    Quantity: Integer;
+    
 }
