@@ -1,5 +1,6 @@
 namespace com.training;
-using { cuid } from '@sap/cds/common';
+
+using {cuid} from '@sap/cds/common';
 
 // type EmailsAddresses_01: array of {
 //     kind: String;
@@ -87,3 +88,12 @@ entity StudentCourse : cuid {
 
 
 };
+
+entity Orders {
+    key ClientEmail : String(65) @odata.Type:'Edm.String';
+        FirstName   : String(30);
+        LastName    : String(30);
+        CreatedOn   : Date;
+        Reviewed    : Boolean;
+        Approved    : Boolean;
+}
