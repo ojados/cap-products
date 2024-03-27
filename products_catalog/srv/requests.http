@@ -1,25 +1,28 @@
 ### Get Orders
-GET http://localhost:4004/odata/v4/manage-orders/GetOrders('client1@client1.com')
+GET http://localhost:4004/odata/v4/manage-orders/Orders('client1@client1.com')
 
 
-GET http://localhost:4004/odata/v4/manage-orders/GetOrders
+GET http://localhost:4004/odata/v4/manage-orders/Orders
 
 ### Create Orders
-POST http://localhost:4004/odata/v4/manage-orders/CreateOrder HTTP/1.1
+POST http://localhost:4004/odata/v4/manage-orders/Orders HTTP/1.1
 Content-Type: application/json
 
 {
-    "ClientEmail": "client@client6.com",
-    "FirstName": "Daniel",
-    "LastName": "Ojados",
+    "ClientEmail": "client5@client5.com",
+    "FirstName": "David",
+    "LastName": "Ramirez",
     "CreatedOn": "2024-03-26"
 }
 
 ### Update Order
-PUT http://localhost:4004/odata/v4/manage-orders/UpdateOrder('client1@client1.com') HTTP/1.1
+PUT http://localhost:4004/odata/v4/manage-orders/Orders('client1@client1.com') HTTP/1.1
 Content-Type: application/json
 
 {
     "FirstName": "Daniel Updated",
     "LastName": "Ojados Updated"
 }
+
+### DELETE Order
+DELETE http://localhost:4004/odata/v4/manage-orders/Orders('client5@client5.com')
