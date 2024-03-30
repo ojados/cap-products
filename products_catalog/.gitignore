@@ -31,4 +31,5 @@ mta_archives/
 # .idea
 
 # @cap-js/cds-typer
+*.gitignore
 @cds-models
